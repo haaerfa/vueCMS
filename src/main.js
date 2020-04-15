@@ -8,6 +8,13 @@ Vue.config.productionTip = false
 
 //配置axios
 axios.defaults.baseURL = 'http://timemeetyou.com:8889/api/private/v1/'
+//设置axios请求拦截,验证token
+axios.interceptors.request.use(config => {
+  //为头对象添加token的验证的Authorization
+  config.headers.Authorization = sessionStorage.getItem('token')
+  //一定要写return oconfig
+  return config
+})
 Vue.prototype.$http = axios
 new Vue({
   router,

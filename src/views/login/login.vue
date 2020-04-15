@@ -7,7 +7,7 @@
    <!-- 登陆表单模块 -->
    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
     <el-form-item prop="username" >
-      <el-input v-model="loginForm.username" prefix-icon="el-icon-user-solid" placeholder="请输入用户名"></el-input>
+      <el-input v-model="loginForm.username" prefix-icon="el-icon-user-solid" placeholder="请输入用户名" ></el-input>
     </el-form-item>
     <el-form-item prop="password">
       <el-input type="password" v-model="loginForm.password" show-password prefix-icon="el-icon-lock"></el-input>
@@ -46,12 +46,15 @@ export default {
       resetClick(){
         this.$refs.loginForm.resetFields()
       },
+      //点击登陆按钮登陆
         login(){
+      //验证数据格式是否符合
       this.$refs.loginForm.validate(async valid=>{
         if(!valid) return false
+        //请求登陆数据
         const {data:res} = await this.$http.post('login',this.loginForm)
-        console.log(res);
         if(res.meta.status!==200) return this.$message.error('登陆失败')
+        //登陆成功保存token 跳转到首页
         sessionStorage.setItem('token',res.data.token)
         this.$message.success('登陆成功')
         this.$router.push('/home')
@@ -94,7 +97,7 @@ export default {
 }
 .login-form{
   position: absolute;
-  bottom: 30px;
+  bottom: 10px;
   left: 10px;
   right: 10px;
 }
