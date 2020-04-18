@@ -27,7 +27,7 @@
 
             <!-- 用户列表 -->
             <el-table :data="userList" stripe style="width: 100%" border fit>
-                <el-table-column type="index" label="" width="50"></el-table-column>
+                <el-table-column type="index" label="" width="50px"></el-table-column>
                 <el-table-column prop="username" label="用户名" min-width="150px">
                 </el-table-column>
                 <el-table-column prop="role_name" label="角色" min-width="100px">
@@ -51,7 +51,7 @@
                             <el-button type="danger" icon="el-icon-delete" circle  @click="removeUserById(scope.row.id)"></el-button>
                         </el-tooltip>
                         <el-tooltip content="分配角色" placement="top" effect="light" enterable>
-                            <el-button type="warning" icon="el-icon-setting" circle></el-button>
+                            <el-button type="warning" icon="el-icon-setting" circle  @click="rollatRoleClick(scope.row)"></el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -108,6 +108,28 @@
                 <el-button type="primary" @click="editUser" >确 定</el-button>
             </div>
         </el-dialog>
+        <!-- 分配角色的对话框 -->
+        <el-dialog
+           title="分配角色"
+           :visible.sync="allotRoleDialog"
+           width="50%"
+          >
+          <div class="userInfo"> 用户名：{{userInfo.username}}</div>
+          <div class="userInfo">当前角色：{{userInfo.role_name}}</div>
+           <el-select v-model="selectedvalue" placeholder="请选择角色">
+    <el-option
+      v-for="item in roleList"
+      :key="item.id"
+      :label="item.roleName"
+      :value="item.id">
+    </el-option>
+  </el-select>
+           <span slot="footer" class="dialog-footer">
+             <el-button @click="allotRoleDialog = false">取 消</el-button>
+             <el-button type="primary" @click = "editRole">确 定</el-button>
+           </span>
+        </el-dialog>
+
     </div>
 </template>
 
@@ -135,11 +157,16 @@
                 },
                 // 修改用户的表单数据
                 editUserInfo:{},
-               
+                //控制分配角色对话框的显示
+               allotRoleDialog:false,
+               //分配角色时获取的当前用户信息
+               userInfo:{},
+               roleList:[],
+               selectedvalue:'',
                 //添加用户表单验证规则
                 addUserrules: {
                     username:[{required:true , message:'请输入用户名' , trigger:'blur' },
-                      { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+                      { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
                     ],
                      password:[{required:true , message:'请输入密码' , trigger:'blur' },
                       { pattern:/[a-zA-Z]\w{5,17}$/, message: '密码必须以字母开头，长度在6~18之间，只能包含字母、数字和下划线', trigger: 'blur' }
@@ -160,9 +187,7 @@
             //获取用户列表
             this.getUserList();
         },
-        mounted() {
-
-        },
+      
         methods: {
             async getUserList() {
                 const {
@@ -193,6 +218,7 @@
             },
             //添加用户
             addUser(){
+                
                this.$refs.addUserRef.validate(async valid=>{
                    if(!valid) return false
                    //数据合法将用户数据同步到数据库
@@ -200,13 +226,16 @@
                    console.log(res)
                    if(res.meta.status !==201) return this.$message.error(res.meta.msg)
                    this.$message.success('添加用户成功')
+                   this.dialogFormVisible = false
                    this.getUserList()
                })
             },
           //点击编辑用户按钮 显示编辑对话框
-          editUserClick(info){
-              this.editDialogVisible = true
-              this.editUserInfo = info     
+          async editUserClick(id){
+              const { data: res } = await this.$http.get('users/' + id)
+            if (res.meta.status !== 200) return this.$message.error('查询用户信息失败！')
+               this.editUserInfo = res.data
+             this.editDialogVisible = true
           },
           //将编辑的用户信息同步到数据库
           editUser(){
@@ -218,6 +247,7 @@
                   })
                  if(res.data.meta.status !==200) return this.$message.error(res.data.meta.msg)
                   this.$message.success("修改用户成功")
+                  this.editDialogVisible=false
                   this.getUserList()
               })
           },
@@ -226,22 +256,40 @@
               this.$refs.editUserRef.resetFields()
           },
           //删除用户操作
-          removeUserById(id){
-            this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+         async removeUserById(id){
+            const confirmResult=await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
            confirmButtonText: '确定',
            cancelButtonText: '取消',
            type: 'warning'
-        }).then(async () => {
-          const res =await  this.$http.delete('users/'+id)
-         if(res.data.meta!==200) return this.$message.error(res.data.meta.msg)
+        }).catch(err=>err)
+        if(confirmResult !=='confirm') return this.$message.info('取消了删除')
+        const res =await  this.$http.delete('users/'+id)
+          console.log(res.data.meta)
+         if(res.data.meta.status!==200) return this.$message.error(res.data.meta.msg)
          this.$message.success('删除用户成功')
          this.getUserList()
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })       
-        })
+          },
+          //点击分配角色按钮
+         async rollatRoleClick(userInfo){
+              this.selectedvalue=''
+              this.userInfo = userInfo
+             
+              const {data : res} = await this.$http.get('roles')
+              if(res.meta.status !==200) return this.$message.error('获取角色列表失败')
+              this.roleList = res.data
+    
+              this.allotRoleDialog = true
+          },
+          async editRole(){
+              const{data : res} =await this.$http.put(`users/${this.userInfo.id}/role`,{
+                  rid:this.selectedvalue
+              })
+              if(res.meta.status!==200) return this.$message.error(res.meta.msg)
+              this.getUserList()
+              
+              this.allotRoleDialog = false
+             
+              
           }
         }
 
@@ -249,11 +297,8 @@
 </script>
 
 <style lang="less" scoped>
-    .el-breadcrumb {
-        margin-bottom: 20px;
-    }
-
-    .searchBtn:hover {
-        background-color: #fff;
-    }
+  .userInfo{
+      padding: 10px;
+      font-size:16px;
+  }
 </style>
