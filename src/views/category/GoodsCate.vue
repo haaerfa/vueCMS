@@ -64,7 +64,6 @@
             @change="parentCateChanged"
             clearable
             style="width: 100%"
-            ref="sysCascader"
           ></el-cascader>
    </el-form-item>
   </el-form>
