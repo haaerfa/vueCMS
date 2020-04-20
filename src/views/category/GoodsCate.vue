@@ -1,6 +1,6 @@
 <template>
-    <div>
-<!-- 面包屑导航区 -->
+  <div>
+    <!-- 面包屑导航区 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>商品管理</el-breadcrumb-item>
@@ -9,73 +9,59 @@
     <!-- 商品分类主体 -->
     <el-card>
       <el-button type="primary" size="mini" @click="addCateClick">添加分类</el-button>
-      <tree-table  :data = "cateList"
-                   :columns='columns'
-                   show-index
-                   index-text=""
-                   stripe
-                   border
-                  :show-row-hover = "false"
-                  :selection-type="false"
-                  :expand-type="false"
-                  class="treeTable"
-      >
-      <template v-slot:isOk = "scope">
-       <i class="el-icon-success" style="color: green" 
-       v-if="scope.row.cat_deleted===false"></i>
-       <i class="el-icon-error" style="color: red" v-else></i>
-      </template>
-      <template v-slot:grade = scope>
-        <el-tag type="success" v-if="scope.row.cat_level===0">一级</el-tag>
-        <el-tag type="primary" v-else-if="scope.row.cat_level===1">二级</el-tag>
-        <el-tag type="warning" v-else>三级</el-tag>
-      </template>
-      <template v-slot:handle="scope">
-        <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
-        <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+      <tree-table :data="cateList" :columns='columns' show-index index-text="" stripe border :show-row-hover="false" :selection-type="false" :expand-type="false" class="treeTable">
+        <template v-slot:isOk="scope">
+          <i class="el-icon-success" style="color: green" v-if="scope.row.cat_deleted===false"></i>
+          <i class="el-icon-error" style="color: red" v-else></i>
+        </template>
+        <template v-slot:grade="scope">
+          <el-tag type="success" v-if="scope.row.cat_level===0">一级</el-tag>
+          <el-tag type="primary" v-else-if="scope.row.cat_level===1">二级</el-tag>
+          <el-tag type="warning" v-else>三级</el-tag>
+        </template>
+        <template v-slot:handle="scope">
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="editCateClick(scope.row)">编辑</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteCate(scope.row)">删除</el-button>
 
-      </template>
+        </template>
       </tree-table>
       <!-- 分页功能 -->
-      <el-pagination
-      @current-change="handleCurrentChange"
-      :current-page="queryParams.pagenum"
-      :page-size="queryParams.pagesize"
-      layout="total, prev, pager, next, jumper"
-      background
-      :total="total">
-    </el-pagination>
+      <el-pagination @current-change="handleCurrentChange" :current-page="queryParams.pagenum" :page-size="queryParams.pagesize" layout="total, prev, pager, next, jumper" background :total="total">
+      </el-pagination>
     </el-card>
     <!-- 添加分类对话框 -->
-    <el-dialog
-      title="添加分类"
-      :visible.sync="addCatedialogVisible"
-      width="50%"
-   >
-      <el-form ref="addCateformRef" label-width="80px" :model="addCateForm"  :rules="addCateFormRules" >
-  <el-form-item label="分类名称" prop="cat_name">
-    <el-input v-model="addCateForm.cat_name"  ></el-input>
-  </el-form-item>
-   <el-form-item label="父类分类" >
-   <el-cascader
-            v-model="selectedKeys"
-            :options="cascaderList"
-            :props="cateProps"
-            @change="parentCateChanged"
-            clearable
-            style="width: 100%"
-          ></el-cascader>
-   </el-form-item>
-  </el-form>
-   
+    <el-dialog title="添加分类" :visible.sync="addCatedialogVisible" width="50%">
+      <el-form ref="addCateformRef" label-width="80px" :model="addCateForm" :rules="addCateFormRules">
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="addCateForm.cat_name"></el-input>
+        </el-form-item>
+        <el-form-item label="父类分类">
+          <el-cascader v-model="selectedKeys" :options="cascaderList" :props="cateProps" @change="parentCateChanged" clearable style="width: 100%"></el-cascader>
+        </el-form-item>
+      </el-form>
+
       <div slot="footer">
         <el-button @click=" addCatedialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addCate">确 定</el-button>
       </div>
     </el-dialog>
-  
-    </div>
- 
+
+    <!-- 编辑分类对话框 -->
+    <!-- 添加分类对话框 -->
+    <el-dialog title="编辑分类" :visible.sync="editCatedialogVisible" width="50%">
+      <el-form ref="editCateformRef" label-width="80px" :model="editCateForm" :rules="addCateFormRules">
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="editCateForm.cat_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click=" editCatedialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editCate">确 定</el-button>
+      </div>
+    </el-dialog>
+
+  </div>
+
 </template>
 
 <script>
@@ -134,7 +120,10 @@ export default {
         cat_name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' }
         ]
-      }
+      },
+      editCatedialogVisible:false,
+      editCateForm:{}
+
         }
       
        
@@ -148,6 +137,8 @@ export default {
      const {data:res}  = await this.$http.get('categories',{params:this.queryParams})
      if(res.meta.status!==200) return this.$message.error(res.meta.msg)
      this.cateList = res.data.result
+   
+     
      this.total=res.data.total
      
      },
@@ -185,8 +176,33 @@ export default {
         this.$message.success('创建分类成功')
         this.addCatedialogVisible = false
       } )
+    },
+    //编辑分类
+    async editCate(){
+      const {data:res} = await this.$http.put(`categories/${this.editCateForm.cat_id}`,
+    {cat_name : this.editCateForm.cat_name})
+    if(res.meta.status !==200) return this.$message.error(res.meta.msg)
+    this.getCateList()
+    this.editCatedialogVisible = false
+    },
+    editCateClick(info){
+      this.editCateForm = info
+       this.editCatedialogVisible=true
+    },
+   //删除分类
+   async deleteCate(row){
+     const confirmResult= await this.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'}).catch(err=>err)
+          if(confirmResult ==='cancel') return this.$message.info('已取消删除')
+          const {data :res} = await this.$http.delete(`categories/${row.cat_id}`)
+          if(res.meta.status!==200) return this.$http.error(res.meta.msg)
+          this.getCateList()
+   }
+   
     }
-    }
+
 };
 </script>
 

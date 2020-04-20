@@ -33,3 +33,14 @@ body,
 .el-breadcrumb {
   margin-bottom: 20px;
 }
+
+.el-table th.gutter {
+  display: table-cell !important;
+}
+
+.el-alert__title {
+  font-size: 15px !important;
+}
+.ql-editor{
+  min-height: 300px;
+}

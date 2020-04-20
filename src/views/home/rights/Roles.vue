@@ -202,7 +202,7 @@ export default {
     editRole(){
         this.$refs.editRoleRef.validate(async valid=>{
             if(!valid) return false
-            console.log(this.editRoleInfo);
+            
             
             const {data:res} =await this.$http.put('roles/'+this.editRoleInfo.roleId,{
                 roleName:this.editRoleInfo.roleName,
@@ -225,7 +225,7 @@ export default {
         return this.$message.info('取消了删除')
 
         const res =await  this.$http.delete('roles/'+id)
-          console.log(res.data.meta)
+         
          if(res.data.meta.status!==200) return this.$message.error(res.data.meta.msg)
          this.$message.success('删除角色成功')
          this.getRoleList()
@@ -276,7 +276,7 @@ export default {
         ...this.$refs.treeRef.getHalfCheckedKeys()
       ]
       const keysStr = keys.join(',')
-      console.log(keysStr)
+ 
       const {data:res} = await this.$http.post(`roles/${this.roleId}/rights`,{rids:keysStr})
           if(res.meta.status!==200) return this.$message.error('分配权限失败')
           this.$message.success('分配权限成功')

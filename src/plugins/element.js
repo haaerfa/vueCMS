@@ -31,7 +31,14 @@ import {
   Cascader,
   Alert,
   TabPane,
-  Tabs
+  Tabs,
+  Steps,
+  Step,
+  Upload,
+  Checkbox,
+  CheckboxGroup,
+  TimelineItem,
+  Timeline
 } from 'element-ui'
 
 Vue.use(Button)
@@ -65,6 +72,13 @@ Vue.use(Cascader)
 Vue.use(Alert)
 Vue.use(TabPane)
 Vue.use(Tabs)
+Vue.use(Steps)
+Vue.use(Step)
+Vue.use(Upload)
+Vue.use(Checkbox)
+Vue.use(CheckboxGroup)
+Vue.use(TimelineItem)
+Vue.use(Timeline)
 
 //挂载消息框
 Vue.prototype.$message = Message

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+Vue.use(VueRouter)
 import Login from '../views/login/login.vue'
 const Home = () => import('../views/home/Home.vue')
 const Welcome = () => import('../views/home/Welcome.vue')
@@ -8,8 +9,10 @@ const Rights = () => import('../views/home/rights/Rights.vue')
 const Roles = () => import('../views/home/rights/Roles.vue')
 const GoodsCate = () => import('../views/category/GoodsCate.vue')
 const CateParams = () => import('../views/category/CateParams.vue')
-Vue.use(VueRouter)
-
+const GoodsList = () => import('../views/category/GoodsList.vue')
+const AddGoods = () => import('../views/category/AddGoods.vue')
+const Order = () => import('../views/order/Order.vue')
+const Reports  = ()=>import('../views/reports/Reports.vue')
 const routes = [{
     path: '/',
     redirect: '/login'
@@ -48,6 +51,22 @@ const routes = [{
       {
         path: 'params',
         component: CateParams
+      },
+      {
+        path: 'goods',
+        component: GoodsList,
+      },
+      {
+        path: 'goods/add',
+        component: AddGoods
+      },
+      {
+        path: 'orders',
+        component: Order
+      },
+      {
+        path:'reports',
+        component:Reports
       }
     ]
   }

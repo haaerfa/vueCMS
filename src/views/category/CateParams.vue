@@ -215,7 +215,7 @@ this.$refs.editFormRef.validate(async valid=>{
   })
   if(res.meta.status!==200) return this.$message.error('编辑参数失败')
   this.$message.success('编辑参数成功')
-  console.log(res.data);
+ 
   this.editDialogVisible = false
 })
 },

@@ -75,7 +75,7 @@ export default {
 }
 .login-box{
   position: relative;
-  width: 450px;
+  width: 500px;
   height: 300px;
   background-color: #fff;
   border-radius: 5px; 
