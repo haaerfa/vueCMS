@@ -22,17 +22,18 @@
       </el-row>
       <el-table :data="goodsList" style="width:100%;font-size:13px;" fit stripe border>
         <el-table-column type="index"> </el-table-column>
-        <el-table-column prop="goods_name" label="商品名称" min-width="400"> </el-table-column>
-        <el-table-column prop="goods_price" label="商品价格（元）" width="80"> </el-table-column>
-        <el-table-column prop="goods_weight" label="商品重量" width="80"> </el-table-column>
-        <el-table-column label="创建时间" min-width='100'>
+        <el-table-column prop="goods_name" label="商品名称" min-width="380"> </el-table-column>
+        <el-table-column prop="goods_price" label="商品价格（元）" width="60"> </el-table-column>
+        <el-table-column prop="goods_number" label="商品数量" width="60"> </el-table-column>        
+        <el-table-column prop="goods_weight" label="商品重量" width="60"> </el-table-column>
+        <el-table-column label="创建时间" min-width='130'>
           <template v-slot="scope">
             {{scope.row.add_time | dateFormat}}
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template v-slot="scope">
-            <el-button type="primary" icon="el-icon-edit" circle></el-button>
+            <el-button type="primary" icon="el-icon-edit" circle @click = editGoodsClick(scope.row)></el-button>
             <el-button type="danger" icon="el-icon-delete" circle @click="deleteGoods(scope.row.goods_id)"></el-button>
           </template>
         </el-table-column>
@@ -41,6 +42,30 @@
       <el-pagination :current-page.sync="queryform.pagenum" :page-size="queryform.pagesize" @current-change="handleCurrentChange" layout="total, prev, pager, next, jumper" :total="total" background>
       </el-pagination>
     </el-card>
+    <el-dialog
+      title="编辑商品"
+      :visible.sync="editGoodsdialogVisible"
+      width="50%"
+     >
+      <el-form ref="editGoods" :model="editGoodsform" label-width="80px" >
+        <el-form-item label="商品名称">
+          <el-input v-model="editGoodsform.goods_name" required></el-input>
+        </el-form-item>
+          <el-form-item label="商品价格">
+          <el-input v-model="editGoodsform.goods_price" required></el-input>
+        </el-form-item>
+         <el-form-item label="商品数量">
+          <el-input v-model="editGoodsform.goods_number" required></el-input>
+        </el-form-item>
+        <el-form-item label="商品重量">
+          <el-input v-model="editGoodsform.goods_weight" required></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="editGoodsdialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editGoods">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -56,7 +81,9 @@ export default {
        },
        query:'',
        total:0,
-       goodsList:[]
+       goodsList:[],
+       editGoodsdialogVisible:false,
+       editGoodsform:{},
         }
     },
     created() {
@@ -104,9 +131,26 @@ export default {
       },
       goAddPage(){
         this.$router.push('/home/goods/add')
+      },
+       //编辑商品
+       editGoodsClick(row){
+         this.editGoodsdialogVisible = true
+         this.editGoodsform = row
+       },
+     editGoods(){
+       this.$refs.editGoods.validate(async valid=>{
+         if(!valid) return
+         const {data:res} = await this.$http.put(`goods/${this.editGoodsform.goods_id}`,{
+           goods_name:this.editGoodsform.goods_name,
+           goods_price:this.editGoodsform.goods_price,
+           goods_number:this.editGoodsform.goods_number,
+           goods_weight:this.editGoodsform.goods_weight    
+         })
+         if(res.meta.status!==201) return this.$message.error(res.meta.msg)
+         this.getGoodsList()
+         this.editGoodsdialogVisible = false
+       })
       }
-
-
 
 
 

@@ -1,10 +1,7 @@
 <template>
-    <div id="login-container">
-      <div class=login-box>
-        <div class="logo">
-      <img src="../../assets/img/cms.svg"  id="logoImg">
-    </div>
-   <!-- 登陆表单模块 -->
+    <div id="login-container">      
+   <div class=login-box>
+     <img src="../../assets/img/avater.svg" alt="dengsicode" class="avater">
    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
     <el-form-item prop="username" >
       <el-input v-model="loginForm.username" prefix-icon="el-icon-user-solid" placeholder="请输入用户名" ></el-input>
@@ -13,7 +10,7 @@
       <el-input type="password" v-model="loginForm.password" show-password prefix-icon="el-icon-lock"></el-input>
     </el-form-item>
     <el-form-item class="btns">
-      <el-button type="primary" @click="login">登陆</el-button>
+      <el-button  @click="login" style="background:#D7A26A;color:#fff;">登陆</el-button>
       <el-button type="info" @click="resetClick">重置</el-button>
     </el-form-item>
    </el-form>
@@ -74,32 +71,22 @@ export default {
   align-items: center;
 }
 .login-box{
+  text-align: center;
   position: relative;
-  width: 500px;
-  height: 300px;
+  width: 400px;
+  height: 500px;
   background-color: #fff;
   border-radius: 5px; 
-  .logo{
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    top:-50px;
-    left:175px;
-    background-color: #eee;
-    border:10px solid #fff;
-    box-shadow: 0 0 10px #eee;
-    #logoImg{
-      width: 100%;
-      height: 100%;
-    }
-  }
+  padding:50px
+}
+.avater{
+  width:100px;
 }
 .login-form{
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
+  bottom:50px;
+  left:5px;
+  right:5px;
 }
 .btns{
   display: flex;

@@ -136,6 +136,8 @@
     }
 }
     .el-main {
-        background-color: #EAEDF1;
+      overflow: hidden;
+      border-radius: 5px;
+        background-color: #eee;
     }
 </style>

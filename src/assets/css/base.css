@@ -3,6 +3,7 @@ body,
 #app {
   height: 100%;
   min-width: 1366px;
+  background-color: #333744;
 }
 
 *,
@@ -43,4 +44,7 @@ body,
 }
 .ql-editor{
   min-height: 300px;
+}
+.el-aside{
+  border-radius: 5px;
 }
