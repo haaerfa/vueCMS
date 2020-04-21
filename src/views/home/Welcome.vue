@@ -31,7 +31,7 @@ export default {
   padding:50px;
 }
 .logo path{
- stroke-dasharray: 1;
+ stroke-dasharray: 520;
  animation: wink 6s ease 3s infinite 
 }
 @keyframes wink {
